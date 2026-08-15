@@ -4,28 +4,21 @@
   "collaborators": [
     "Rafael Bradley <rafabradleyrb@gmail.com>"
   ],
-  "version": "1.1.16",
-  "files": [
-    "duckity_wasm_bg.js",
-    "duckity_wasm_bg.wasm",
-    "duckity_wasm_bg.wasm.d.ts",
-    "duckity_wasm.js",
-    "duckity_wasm.d.ts"
-  ],
-  "exports": {
-    ".": {
-      "default": "./duckity_wasm.js",
-      "types": "./duckity_wasm.d.ts"
-    },
-    "./worker.wasm": {
-      "default": "./duckity_wasm_bg.wasm",
-      "types": "./duckity_wasm_bg.wasm.d.ts"
-    }
+  "description": "Solve Duckity challenges in the browser via WASM.",
+  "version": "1.1.20",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/duckitys/sdks"
   },
-  "main": "duckity_wasm.js",
-  "types": "duckity_wasm.d.ts",
+  "files": [
+    "duckity_bg.wasm",
+    "duckity.js",
+    "duckity.d.ts"
+  ],
+  "main": "duckity.js",
+  "types": "duckity.d.ts",
   "sideEffects": [
-    "./duckity_wasm.js",
     "./snippets/*"
   ]
 }

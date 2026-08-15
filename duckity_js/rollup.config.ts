@@ -13,9 +13,26 @@ export default [
         file: "dist/index.js",
         format: "esm",
       },
+    ],
+    plugins: [
+      typescript({
+        declaration: true,
+        declarationDir: "dist/types",
+        rootDir: "src",
+        tsconfig: "tsconfig.json",
+      }),
+      nodeResolve(),
+      commonjs(),
+      // importMetaAssets(),
+      // terser(),
+    ],
+  },
+  {
+    input: "src/processing/worker.ts",
+    output: [
       {
-        file: "dist/index.cjs",
-        format: "cjs",
+        file: "dist/worker.js",
+        format: "esm",
       },
     ],
     plugins: [
@@ -25,12 +42,12 @@ export default [
         rootDir: "src",
         tsconfig: "tsconfig.json",
       }),
-      wasm({
-        targetEnv: "auto-inline",
-      }),
       nodeResolve(),
       commonjs(),
-      terser(),
+      wasm({
+        targetEnv: "browser",
+        fileName: "[name][extname]"
+      }),
     ],
   },
   {

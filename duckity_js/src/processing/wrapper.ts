@@ -1,10 +1,9 @@
-import wasm from "@duckity/wasm/worker.wasm";
 import * as Comlink from "comlink";
 
 /**
  * Web Worker that handles the processing of the challenges.
  */
-const worker = new Worker(wasm, {
+const worker = new Worker(new URL("./worker.js", import.meta.url), {
   type: "module",
 });
 

@@ -71,5 +71,3 @@ export async function solve(
 
   return solution;
 }
-
-export default { solve };

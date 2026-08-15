@@ -20,7 +20,8 @@
         width: 300px;
       }
 
-      input, button {
+      input,
+      button {
         padding: 0.5rem;
       }
     </style>
@@ -47,24 +48,28 @@
     </form>
 
     <script type="module">
-      import duckity from "../dist/index.js";
+      import * as duckity from "../dist/index.js";
 
-      const DUCKITY_ID = "vfk_-PZjXP3i8IL7I51S3";  // The protection profile's ID
+      const DUCKITY_ID = "IHlCh2HhXtYfE55idBeL4"; // The protection profile's ID
 
+      console.time("solution")
       let solution = await duckity.solve(DUCKITY_ID);
+      console.timeEnd("solution")
 
       const form = document.getElementById("form");
       const inputEmail = document.getElementById("input-email");
       const inputPassword = document.getElementById("input-password");
 
-      form.onsubmit = async (e) => {
+      function handleSubmit(e) {
         e.preventDefault();
 
         const email = inputEmail.value;
         const password = inputPassword.value;
 
         alert("Submitted!");
-      };
+      }
+
+      form.addEventListener("submit", handleSubmit);
     </script>
   </body>
 </html>

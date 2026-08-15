@@ -1,8 +1,11 @@
 [package]
-name = "duckity_wasm"
-version = "0.1.0"
+name = "wasm"
+version = "1.1.20"
+description = "Solve Duckity challenges in the browser via WASM."
 authors = ["Rafael Bradley <rafabradleyrb@gmail.com>"]
 edition = "2018"
+license = "MIT"
+repository = "https://github.com/duckitys/sdks"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
@@ -13,3 +16,6 @@ duckity-core = { version = "0.1.0", path = "../duckity_core" }
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3.34"
+
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = ["-O3", "--all-features", "--enable-bulk-memory"]

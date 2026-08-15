@@ -14,7 +14,6 @@
   "exports": {
     ".": {
       "import": "./dist/index.js",
-      "require": "./dist/index.cjs",
       "types": "./dist/index.d.ts"
     }
   },
@@ -25,7 +24,7 @@
     "prepublishOnly": "bun run clean:all && bun run bundle && bun run clean:types"
   },
   "dependencies": {
-    "@duckity/wasm": "1.1.16"
+    "@duckity/wasm": "file:../duckity_wasm/pkg"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^29.0.3",

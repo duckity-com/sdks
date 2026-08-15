@@ -94,10 +94,10 @@ mod schemas;
 ///
 /// Returns:
 /// [`ChallengeGetter`] - An awaitable builder to get a challenge.
-pub fn get(protection_profile_id: String) -> ChallengeGetter {
+pub fn get(protection_profile_id: impl Into<String>) -> ChallengeGetter {
     ChallengeGetter {
-        base_url: "https://quack.duckity.dev".into(),
-        protection_profile_id,
+        base_url: "https://quack.duckity.com".into(),
+        protection_profile_id: protection_profile_id.into(),
         keys: HashMap::new(),
     }
 }
@@ -147,14 +147,14 @@ impl ChallengeGetter {
 
         let url = {
             let mut url = self.base_url;
-            url.push_str("/v1/challenge");
+            url.push_str(&format!(
+                "/v1/challenges/{}/issue",
+                self.protection_profile_id
+            ));
             url
         };
 
-        let request = client.post(url).json(&ChallengeRequest {
-            id: self.protection_profile_id,
-            keys: self.keys,
-        });
+        let request = client.post(url).json(&ChallengeRequest { keys: self.keys });
 
         let response = request.send().await?;
         let response: ChallengeResponse = response.json().await?;
@@ -183,10 +183,10 @@ impl IntoFuture for ChallengeGetter {
 /// * `Ok(String)` - The encoded solution string.
 /// * `Err(DuckityError)` - An error occurred while decoding the challenge or encoding the
 ///   solution.
-pub fn solve(challenge: String) -> Result<String, DuckityError> {
-    let decoded_challenge = core::decode(&challenge)?;
+pub fn solve(challenge: &str) -> Result<String, DuckityError> {
+    let decoded_challenge = core::decode(challenge)?;
     let solution = core::solve(&decoded_challenge);
-    let encoded_solution = core::encode(&challenge, &solution)?;
+    let encoded_solution = core::encode(challenge, &solution)?;
 
     Ok(encoded_solution)
 }

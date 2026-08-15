@@ -24,9 +24,6 @@ interface GetDuckityChallengeOptions {
  * @returns The solution to the challenge issued by Duckity.
  */
 declare function solve(protectionProfileId: string, options?: GetDuckityChallengeOptions): Promise<string>;
-declare const _default: {
-    solve: typeof solve;
-};
 
-export { _default as default, solve };
+export { solve };
 export type { GetDuckityChallengeOptions };

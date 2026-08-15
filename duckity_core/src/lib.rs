@@ -20,13 +20,11 @@
 //! like follows:
 //!
 //! ```http
-//! GET /v1/challenge HTTP/1.1
+//! GET /v1/challenges/{protection_profile_id}/issue HTTP/1.1
 //! Host: quack.duckity.dev
 //! Content-Type: application/json
 //!
 //! {
-//!   "application_id": "your-application-id",
-//!   "protection_profile_id": "your-protection-profile-id",
 //!   "keys": {
 //!     "your_cctc_key": "value"
 //!   }

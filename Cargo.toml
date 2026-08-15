@@ -1,5 +1,5 @@
 [workspace]
-members = ["duckity_c","duckity_core", "duckity_rs", "duckity_wasm"]
+members = ["duckity_c", "duckity_core", "duckity_rs", "duckity_wasm"]
 resolver = "3"
 
 [profile.release]

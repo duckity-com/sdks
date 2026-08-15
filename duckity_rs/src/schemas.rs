@@ -4,9 +4,6 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize)]
 pub struct ChallengeRequest {
-    /// The protection profile's ID.
-    pub id: String,
-
     /// CCTC key-value pairs.
     pub keys: HashMap<String, String>,
 }

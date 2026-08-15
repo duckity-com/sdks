@@ -5,7 +5,7 @@
     "": {
       "name": "@duckity/js",
       "dependencies": {
-        "@duckity/wasm": "1.1.16",
+        "@duckity/wasm": "file:../duckity_wasm/pkg",
       },
       "devDependencies": {
         "@rollup/plugin-commonjs": "^29.0.3",
@@ -27,7 +27,7 @@
 
     "@babel/helper-validator-identifier": ["@babel/helper-validator-identifier@7.29.7", "", {}, "sha512-qehxGkRj55h/ff8EMaJ+cYhyaKlHIxqYDn682wQD7RNp9UujOQsHog2uS0r2vzr4pW+sXf90NeeayjcNaX3fFg=="],
 
-    "@duckity/wasm": ["@duckity/wasm@1.1.16", "", {}, "sha512-P0TDKQ187S68D3ri2ZW9m60gCnUj+/iDLgwWwJLAbfiJhxEFfsCb7tJDgaQQR9mJ2PRETuBHc4TjbLphSuAjGg=="],
+    "@duckity/wasm": ["@duckity/wasm@file:../duckity_wasm/pkg", {}],
 
     "@jridgewell/gen-mapping": ["@jridgewell/gen-mapping@0.3.13", "", { "dependencies": { "@jridgewell/sourcemap-codec": "^1.5.0", "@jridgewell/trace-mapping": "^0.3.24" } }, "sha512-2kkt/7niJ6MgEPxF0bYdQ6etZaA+fQvDcLKckhy1yIQOzaoKjBBjSj63/aLVjYE3qhRt5dvM+uUyfCg6UKCBbA=="],
 

@@ -5,5 +5,14 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "gmpy2>=2.3.1",
     "httpx>=0.28.1",
 ]
+
+[dependency-groups]
+dev = [
+    "gmpy2-stubs>=2.2.1.5",
+]
+
+[tool.ruff]
+line-length = 100

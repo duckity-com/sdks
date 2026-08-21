@@ -21,8 +21,8 @@ pub struct Challenge {
 /// The solution to a challenge.
 #[derive(Serialize, Deserialize)]
 pub struct Solution {
-    pub y: Vec<u8>,
-    pub pi: Vec<u8>,
+    pub y: Vec<u32>,
+    pub pi: Vec<u32>,
 }
 
 /// An error occurred while decoding a challenge string.
@@ -79,8 +79,8 @@ pub fn decode(challenge: &str) -> Result<Challenge, DuckityDecodeError> {
 /// Returns:
 /// [`Solution`] - The solution to the challenge.
 pub fn solve(challenge: &Challenge) -> Solution {
-    let n = Integer::from_digits(&challenge.n, Order::MsfBe);
-    let x = Integer::from_digits(&challenge.x, Order::MsfBe);
+    let n = Integer::from_digits(&challenge.n, Order::Msf);
+    let x = Integer::from_digits(&challenge.x, Order::Msf);
 
     let mut y = x.clone();
 
@@ -88,11 +88,11 @@ pub fn solve(challenge: &Challenge) -> Solution {
         y = y.pow_mod(&Integer::from(2), &n).unwrap();
     }
 
-    let mut bytes: Vec<u8> = x.to_digits(Order::MsfBe);
-    bytes.append(&mut y.to_digits(Order::MsfBe));
+    let mut bytes: Vec<u8> = x.to_digits(Order::Msf);
+    bytes.append(&mut y.to_digits(Order::Msf));
 
     let z = Sha256::digest(bytes);
-    let z_int = Integer::from_digits(&z, Order::MsfBe);
+    let z_int = Integer::from_digits(&z, Order::Msf);
     let l = z_int.next_prime();
 
     let mut pi = Integer::from(1);
@@ -112,8 +112,8 @@ pub fn solve(challenge: &Challenge) -> Solution {
     }
 
     Solution {
-        y: y.to_digits(Order::MsfBe),
-        pi: pi.to_digits(Order::MsfBe),
+        y: y.to_digits(Order::Msf),
+        pi: pi.to_digits(Order::Msf),
     }
 }
 

@@ -1,71 +1,52 @@
-from httpx import AsyncClient
+import httpx
+
+from duckity import core
 
 
-_client = AsyncClient()
+_http = httpx.AsyncClient()
 
 
 class Client:
-    base_url: str = "https://quack.duckity.dev"
+    _base_url = "https://api.duckity.com/d1"
 
-    def __init__(self, base_url: str | None = None):
+    def __init__(self, base_url: str = None):
         if base_url is not None:
-            self.base_url = base_url
+            self._base_url = base_url
 
-    async def get_challenge(
-        self,
-        protection_profile_id: str,
-        *,
-        keys: dict[str, str] = {},
-    ) -> str:
-        """Fetches a challenge from the Duckling API.
+    async def issue_challenge(
+        self, protection_profile_id: str, threat_correlation_keys: dict[str, str] = None
+    ) -> "core.Challenge":
+        """Gets a new challenge from the API.
 
         Args:
-            protection_profile_id (str): The protection profile ID for which to fetch the challenge.
-            keys (dict[str, str], optional): A map of CCTC keys to values. Defaults to no KV pairs.
+            protection_profile_id (str): The ID of the protection profile to get the challenge for.
+            threat_correlation_keys (dict[str, str], optional): A map of threat correlation keys to
+                values to use. Defaults to an empty map.
 
         Returns:
-            str: The challenge string to be solved.
+            Challenge: The newly issued challenge.
         """
 
-        response = await _client.post(
-            f"{self.base_url}/v1/challenge",
-            json={
-                "id": protection_profile_id,
-                "keys": keys,
-            },
+        if threat_correlation_keys is None:
+            threat_correlation_keys = dict()
+
+        response = await _http.post(
+            f"{self._base_url}/challenges/{protection_profile_id}/issue",
+            json={"keys": threat_correlation_keys},
         )
         response.raise_for_status()
 
         data = response.json()
 
-        return data["challenge"]
+        return core.decode(data["challenge"])
 
     async def validate_challenge(
-        self,
-        application_id: str,
-        application_secret: str,
-        protection_profile_id: str,
+        self, protection_profile_id: str, application_secret: str, solution: str, ip: str
     ) -> bool:
-        """Validates a solved challenge with the Duckling API.
-
-        Args:
-            application_id (str): The application ID for which to validate the challenge.
-            application_secret (str): The secret of the application for which to validate the
-                challenge.
-            protection_profile_id (str): The protection profile ID for which to validate the
-                challenge.
-
-        Returns:
-            bool: Whether the solution is valid or not.
-        """
-
-        response = await _client.post(
-            f"{self.base_url}/v1/validate",
+        response = await _http.post(
+            f"{self._base_url}/challenges/{protection_profile_id}/validate",
+            json={"solution": solution, "ip": ip},
             headers={"Authorization": f"Bearer {application_secret}"},
-            json={
-                "application_id": application_id,
-                "protection_profile_id": protection_profile_id,
-            },
         )
         response.raise_for_status()
 

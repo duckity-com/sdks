@@ -23,8 +23,7 @@ export default [
       }),
       nodeResolve(),
       commonjs(),
-      // importMetaAssets(),
-      // terser(),
+      terser(),
     ],
   },
   {
@@ -44,10 +43,7 @@ export default [
       }),
       nodeResolve(),
       commonjs(),
-      wasm({
-        targetEnv: "browser",
-        fileName: "[name][extname]"
-      }),
+      terser(),
     ],
   },
   {

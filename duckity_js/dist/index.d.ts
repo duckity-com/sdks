@@ -9,7 +9,9 @@ interface GetDuckityChallengeOptions {
         [key: string]: string;
     };
     /**
-     * The base URL to the API endpoint. Defaults to `https://quack.duckity.com` if not provided.
+     * The base URL to the API endpoint. Defaults to `https://api.duckity.com/d1` if not provided.
+     *
+     * The version must be specified in the URL path.
      *
      * Only update this when self-hosting a Duckling.
      */

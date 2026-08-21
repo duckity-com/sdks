@@ -11,7 +11,9 @@ export interface GetDuckityChallengeOptions {
   keys?: { [key: string]: string };
 
   /**
-   * The base URL to the API endpoint. Defaults to `https://quack.duckity.com` if not provided.
+   * The base URL to the API endpoint. Defaults to `https://api.duckity.com/d1` if not provided.
+   * 
+   * The version must be specified in the URL path.
    *
    * Only update this when self-hosting a Duckling.
    */
@@ -59,7 +61,7 @@ export async function solve(
   }
 
   let response: ChallengeResponse = await post(
-    `${options?.api || "https://quack.duckity.com"}/v1/challenges/${protectionProfileId}/issue`,
+    `${options?.api || "https://api.duckity.com/d1"}/challenges/${protectionProfileId}/issue`,
     {
       body: {
         keys: options?.keys || {},

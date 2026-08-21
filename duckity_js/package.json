@@ -24,7 +24,7 @@
     "prepublishOnly": "bun run clean:all && bun run bundle && bun run clean:types"
   },
   "dependencies": {
-    "@duckity/wasm": "file:../duckity_wasm/pkg"
+    "comlink": "^4.4.2"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^29.0.3",
@@ -33,10 +33,10 @@
     "@rollup/plugin-typescript": "^12.3.0",
     "@rollup/plugin-wasm": "^6.2.2",
     "@types/bun": "latest",
-    "rollup": "^4.62.3",
-    "rollup-plugin-dts": "^6.4.1"
+    "rollup": "^4.62.5",
+    "rollup-plugin-dts": "^6.5.1"
   },
   "peerDependencies": {
-    "typescript": "^5"
+    "typescript": "^5.9.3"
   }
 }

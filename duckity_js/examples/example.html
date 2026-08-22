@@ -50,11 +50,12 @@
     <script type="module">
       import * as duckity from "../dist/index.js";
 
-      const DUCKITY_ID = "idp-r4-dpQmaQYq1s4uAW"; // The protection profile's ID
+      const PROTECTION_PROFILE_ID = "idp-r4-dpQmaQYq1s4uAW";
 
       console.time("solution")
-      let solution = await duckity.solve(DUCKITY_ID);
+      let solution = await duckity.solve(PROTECTION_PROFILE_ID);
       console.timeEnd("solution")
+      console.log("Solution", solution)
 
       const form = document.getElementById("form");
       const inputEmail = document.getElementById("input-email");

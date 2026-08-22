@@ -44,10 +44,11 @@ class Solution:
 def decode(challenge: str) -> Challenge:
     parts = challenge.split(".")
 
-    if len(parts) != 2:
+    # 2 parts for only a challenge, 3 parts for a solved challenge
+    if len(parts) not in [2, 3]:
         raise ValueError("The challenge string passed did not have two section.")
 
-    challenge_part, _ = parts
+    challenge_part = parts[0]
 
     # Readd padding
     data = base64.urlsafe_b64decode(challenge_part + "=" * (-len(challenge_part) % 4))
@@ -61,7 +62,7 @@ def decode(challenge: str) -> Challenge:
     x = gmpy2.mpz.from_bytes(b"".join(b.to_bytes(4) for b in x))
 
     return Challenge(
-        _raw=challenge,
+        _raw=".".join(challenge.split(".")[:2]),  # Keep only the first two sections
         n=n,
         x=x,
         t=t,

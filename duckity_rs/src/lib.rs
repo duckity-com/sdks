@@ -11,7 +11,7 @@
 //! # Quick Start
 //!
 //! First of all, you need a Duckity application. Head over to the
-//! [Duckity dashboard](https://dash.duckity.dev) to create one if you don't have created it yet.
+//! [Duckity dashboard](https://app.duckity.com) to create one if you don't have created it yet.
 //!
 //! To get a challenge, use [`duckity::get`](get).
 //!
@@ -19,22 +19,12 @@
 //! let challenge = duckity::get(application_id, protection_profile_id).await?;
 //! ```
 //!
-//! You can specify Custom-Context Threat Correlation keys using
-//! [`duckity::get().key()`](ChallengeGetter::key), for example:
-//!
-//! ```
-//! let challenge = duckity::get(application_id, protection_profile_id)
-//!     .key("username", "nyeki")
-//!     .key("email", "hey@duckity.dev")
-//!     .await?;
-//! ```
-//!
 //! If you self-host your duckling, use [`duckity::get().base_url()`](ChallengeGetter::base_url) to
 //! point the client to your duckling like follows:
 //!
 //! ```
 //! let challenge = duckity::get(application_id, protection_profile_id)
-//!     .base_url("https://quack.example.com")
+//!     .base_url("https://quack.example.com/v1")
 //!     .await?;
 //! ```
 //!
@@ -60,11 +50,10 @@
 //! our [SDKs repository in GitHub](https://github.com/duckity-dev/sdks). We reward good
 //! contributions with Duckity Pro tiers 😉
 
-use std::collections::HashMap;
 use std::pin::Pin;
 
 pub use crate::error::DuckityError;
-use crate::schemas::{ChallengeRequest, ChallengeResponse};
+use crate::schemas::ChallengeResponse;
 
 pub mod core;
 mod error;
@@ -74,18 +63,12 @@ mod schemas;
 ///
 /// For example:
 /// ```
-/// // Challenge from quack.duckity.dev without CCTC keys.
-/// let challenge = duckity::get(application_id, protection_profile_id).await?;
-///
-/// // Challenge from quack.duckity.dev with CCTC keys.
-/// let challenge = duckity::get(application_id, protection_profile_id)
-///     .key("username", "nyeki")
-///     .key("email", "hey@duckity.dev")
-///     .await?;
+/// // Challenge from api.duckity.com.
+/// let challenge = duckity::get(protection_profile_id).await?;
 ///
 /// // Challenge from a self-hosted duckling.
 /// let challenge = duckity::get(protection_profile_id)
-///     .base_url("https://quack.example.com")
+///     .base_url("https://quack.example.com/v1")
 ///     .await?;
 /// ```
 ///
@@ -96,9 +79,8 @@ mod schemas;
 /// [`ChallengeGetter`] - An awaitable builder to get a challenge.
 pub fn get(protection_profile_id: impl Into<String>) -> ChallengeGetter {
     ChallengeGetter {
-        base_url: "https://quack.duckity.com".into(),
+        base_url: "https://api.duckity.com/d1".into(),
         protection_profile_id: protection_profile_id.into(),
-        keys: HashMap::new(),
     }
 }
 
@@ -106,26 +88,13 @@ pub fn get(protection_profile_id: impl Into<String>) -> ChallengeGetter {
 pub struct ChallengeGetter {
     base_url: String,
     protection_profile_id: String,
-    keys: HashMap<String, String>,
 }
 
 impl ChallengeGetter {
-    /// Add a CCTC key.
-    ///
-    /// Arguments:
-    /// * `key` - The name of the key.
-    /// * `value` - The value of the key.
-    ///
-    /// Returns:
-    /// [`ChallengeGetter`] - The current builder with the CCTCK set.
-    pub fn key(mut self, key: impl Into<String>, value: impl Into<String>) -> Self {
-        self.keys.insert(key.into(), value.into());
-        self
-    }
-
     /// Sets the base URL of the duckling API.
     ///
-    /// By default, this is `https://quack.duckity.dev`. Set this to scheme + host, without path.
+    /// By default, this is `https://api.duckity.com/d1`. Set this to scheme + host + version base
+    /// path, without trailing slash.
     ///
     /// Arguments:
     /// * `url` - The base URL.
@@ -147,14 +116,11 @@ impl ChallengeGetter {
 
         let url = {
             let mut url = self.base_url;
-            url.push_str(&format!(
-                "/v1/challenges/{}/issue",
-                self.protection_profile_id
-            ));
+            url.push_str(&format!("/challenges/{}/issue", self.protection_profile_id));
             url
         };
 
-        let request = client.post(url).json(&ChallengeRequest { keys: self.keys });
+        let request = client.post(url);
 
         let response = request.send().await?;
         let response: ChallengeResponse = response.json().await?;

@@ -1,12 +1,4 @@
-use std::collections::HashMap;
-
-use serde::{Deserialize, Serialize};
-
-#[derive(Serialize)]
-pub struct ChallengeRequest {
-    /// CCTC key-value pairs.
-    pub keys: HashMap<String, String>,
-}
+use serde::Deserialize;
 
 #[derive(Deserialize)]
 pub struct ChallengeResponse {

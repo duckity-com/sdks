@@ -68,7 +68,7 @@ export function post<T>(
   return request(url, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json",
+      ...(options?.body ? { "Content-Type": "application/json" } : {}),
       ...options?.headers,
     },
     ...options,

@@ -20,15 +20,8 @@
 //! like follows:
 //!
 //! ```http
-//! GET /v1/challenges/{protection_profile_id}/issue HTTP/1.1
-//! Host: quack.duckity.dev
-//! Content-Type: application/json
-//!
-//! {
-//!   "keys": {
-//!     "your_cctc_key": "value"
-//!   }
-//! }
+//! GET /d1/challenges/{protection_profile_id}/issue HTTP/1.1
+//! Host: api.duckity.com
 //! ```
 //!
 //! If successful, you'll get a response that looks like follows:

@@ -8,7 +8,8 @@ use crate::core;
 #[derive(Debug, Error)]
 #[error(transparent)]
 pub enum DuckityError {
-    #[error("An error occurred when making a request to Duckity's API.")]
+    #[cfg(feature = "std")]
+    #[error("An error occurred when making a request to Duckity's API: {0}")]
     Request(#[from] reqwest::Error),
 
     Decoding(#[from] core::DuckityDecodeError),

@@ -1,0 +1,26 @@
+{
+    "overrides": [
+        {
+            "files": [
+                "*.tsx",
+                "*.jsx",
+                "*.ts",
+                "*.js"
+            ],
+            "options": {
+                "tabWidth": 2
+            }
+        },
+        {
+            "files": [
+                "*.mdx",
+                "*.md"
+            ],
+            "options": {
+                "tabWidth": 4,
+                "proseWrap": "always",
+                "printWidth": 100
+            }
+        }
+    ]
+}

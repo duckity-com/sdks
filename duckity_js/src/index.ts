@@ -1,4 +1,4 @@
-import wrapper from "./processing/wrapper";
+import { getWorkerApi } from "./processing/wrapper";
 import { post } from "./requests";
 
 /**
@@ -13,19 +13,6 @@ export interface GetDuckityChallengeOptions {
    * Only update this when self-hosting a Duckling.
    */
   api?: string;
-
-  // /**
-  //  * When this is `false`, the client will assume it is allowed to get a challenge the first time
-  //  * one is requested. This may not always be true (when the client has an active penalty or used
-  //  * all of their allowed requests in another session), case in which the client may be penalized.
-  //  *
-  //  * When this is `true`, an extra request will be made to the Duckling API to synchronize the
-  //  * client's state with the server's state. This extra request will not issue a challenge, rather
-  //  * only synchronize the client's state with the server's state. If the client is penalized or has
-  //  * to wait before being allowed to get a challenge, the client will be informed of this. It'll
-  //  * avoid getting it unnecessarily penalized at the cost of an extra request.
-  //  */
-  // sync?: boolean;
 }
 
 /**
@@ -44,6 +31,7 @@ interface ChallengeResponse {
  *
  * @param protectionProfileId The ID of the protection profile to get the challenge for.
  * @param options Optional parameters for the challenge issuance.
+ * 
  * @returns The solution to the challenge issued by Duckity.
  */
 export async function solve(
@@ -59,7 +47,70 @@ export async function solve(
     `${options?.api || "https://api.duckity.com/d1"}/challenges/${protectionProfileId}/issue`,
   );
 
-  let solution = await wrapper.solve(response.challenge);
+  let solution = await getWorkerApi().solve(response.challenge);
 
   return solution;
+}
+
+/**
+ * Options for validating a Duckity solution with the API.
+ */
+export interface ValidateDuckitySolutionOptions {
+  /**
+   * The base URL to the API endpoint. Defaults to `https://api.duckity.com/d1` if not provided.
+   *
+   * The version must be specified in the URL path.
+   *
+   * Only update this when self-hosting a Duckling.
+   */
+  api?: string;
+}
+
+/**
+ * The response from the Duckling API when validating a solution.
+ */
+interface ValidationResponse {
+  /**
+   * Whether the submitted solution is valid.
+   */
+  is_valid: boolean;
+}
+
+/**
+ * Validates a client-submitted solution token.
+ * 
+ * @param solution The solution token to validate.
+ * @param clientIp The IP of the client that submitted the solution token.
+ * @param applicationSecret The protection profile's application secret.
+ * @param protectionProfileId The ID of the protection profile for which this challenge was issued.
+ * @param options Additional options to customize the behavior of this call.
+ * 
+ * @returns Whether the solution was valid or not.
+ */
+export async function validate(
+  solution: string,
+  clientIp: string,
+  applicationSecret: string,
+  protectionProfileId: string,
+  options?: ValidateDuckitySolutionOptions,
+): Promise<boolean> {
+  if (options?.api && options.api.endsWith("/")) {
+    // Remove the trailing slash from the API URL if provided
+    options.api = options.api.slice(0, -1);
+  }
+
+  let response: ValidationResponse = await post(
+    `${options?.api || "https://api.duckity.com/d1"}/challenges/${protectionProfileId}/validate`,
+    {
+      headers: {
+        Authorization: `Bearer ${applicationSecret}`,
+      },
+      body: {
+        solution,
+        ip: clientIp,
+      },
+    },
+  );
+
+  return response.is_valid;
 }

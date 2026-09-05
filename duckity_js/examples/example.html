@@ -52,8 +52,9 @@
 
       const PROTECTION_PROFILE_ID = "idp-r4-dpQmaQYq1s4uAW";
 
+      console.log("Starting solution...")
       console.time("solution")
-      let solution = await duckity.solve(PROTECTION_PROFILE_ID);
+      let solution = await duckity.solve(PROTECTION_PROFILE_ID, { api: "http://localhost:3210/v1" });
       console.timeEnd("solution")
       console.log("Solution", solution)
 

@@ -40,7 +40,7 @@ async def main():
 
     # In async code with actual concurrency, unlike this example, move this call to a thread.
     is_valid_start = time.perf_counter()
-    is_valid = await client.validate_challenge(
+    is_valid = await client.validate(
         PROTECTION_PROFILE_ID, APPLICATION_SECRET, solution, challenge.ip
     )
     is_valid_elapsed = time.perf_counter() - is_valid_start

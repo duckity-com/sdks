@@ -1,9 +1,14 @@
+import asyncio
+
+from concurrent.futures import ProcessPoolExecutor
+
 import httpx
 
 from duckity import core
 
 
 _http = httpx.AsyncClient()
+_executor = ProcessPoolExecutor()
 
 
 class Client:
@@ -13,36 +18,49 @@ class Client:
         if base_url is not None:
             self._base_url = base_url
 
-    async def issue_challenge(
-        self, protection_profile_id: str, threat_correlation_keys: dict[str, str] = None
-    ) -> "core.Challenge":
-        """Gets a new challenge from the API.
+    async def solve(self, protection_profile_id: str) -> str:
+        """Gets a new challenge from the API and solves it.
 
         Args:
             protection_profile_id (str): The ID of the protection profile to get the challenge for.
-            threat_correlation_keys (dict[str, str], optional): A map of threat correlation keys to
-                values to use. Defaults to an empty map.
 
         Returns:
-            Challenge: The newly issued challenge.
+            str: The solution token.
         """
-
-        if threat_correlation_keys is None:
-            threat_correlation_keys = dict()
 
         response = await _http.post(
             f"{self._base_url}/challenges/{protection_profile_id}/issue",
-            json={"keys": threat_correlation_keys},
+            headers={"X-Duckity-CSRF": "1"},
         )
         response.raise_for_status()
 
         data = response.json()
+        challenge = core.decode(data["challenge"])
 
-        return core.decode(data["challenge"])
+        loop = asyncio.get_running_loop()
+        solution = await loop.run_in_executor(
+            _executor,
+            core.solve,
+            challenge,
+        )
 
-    async def validate_challenge(
-        self, protection_profile_id: str, application_secret: str, solution: str, ip: str
+        return core.encode(challenge, solution)
+
+    async def validate(
+        self, solution: str, ip: str, application_secret: str, protection_profile_id: str
     ) -> bool:
+        """Validates a solution token.
+
+        Args:
+            solution (str): The encoded solution token.
+            ip (str): The IP of the client that submitted the solution.
+            application_secret (str): The application's secret.
+            protection_profile_id (str): The protection profile ID for which this token was issued.
+
+        Returns:
+            bool: Whether the solution is valid.
+        """
+
         response = await _http.post(
             f"{self._base_url}/challenges/{protection_profile_id}/validate",
             json={"solution": solution, "ip": ip},
@@ -53,3 +71,12 @@ class Client:
         data = response.json()
 
         return data["is_valid"]
+
+
+_default_client = Client()
+
+solve = _default_client.solve
+validate = _default_client.validate
+
+
+__ALL__ = ["Client", "solve", "validate"]

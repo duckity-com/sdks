@@ -1,5 +1,11 @@
 //! Low-level implementation of challenge decoding, solving, and encoding.
 
+use alloc::string::String;
+use alloc::vec;
+use alloc::vec::Vec;
+#[cfg(feature = "std")]
+use std::net::IpAddr;
+
 use base64::Engine;
 use base64::prelude::BASE64_URL_SAFE_NO_PAD;
 use rug::integer::Order;
@@ -11,18 +17,39 @@ use thiserror::Error;
 /// The meaningful-to-the-client parts of a challenge.
 ///
 /// This cannot be re-encoded into the original challenge string. Keep both.
-#[derive(Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct Challenge {
+    /// The IP of the client this challenge was issued for.
+    #[cfg(feature = "std")]
+    pub ip: IpAddr,
+    /// The IP of the client this challenge was issued for.
+    #[cfg(not(feature = "std"))]
+    pub ip: String,
+    /// This challenge's unique ID.
+    #[serde(alias = "challenge_id")]
+    pub id: String,
     n: Vec<u32>,
     x: Vec<u32>,
     t: u32,
 }
 
+impl Challenge {
+    /// Returns the challenge's hardness.
+    /// 
+    /// This is a reader for `Challenge::t`.
+    /// 
+    /// Returns:
+    /// [`u32`] - The challenge's hardness.
+    pub fn hardness(&self) -> u32 {
+        self.t
+    }
+}
+
 /// The solution to a challenge.
-#[derive(Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct Solution {
-    pub y: Vec<u32>,
-    pub pi: Vec<u32>,
+    y: Vec<u32>,
+    pi: Vec<u32>,
 }
 
 /// An error occurred while decoding a challenge string.
@@ -69,6 +96,30 @@ pub fn decode(challenge: &str) -> Result<Challenge, DuckityDecodeError> {
     Ok(decoded)
 }
 
+fn get_digits_from_integer_buf<T>(integer: impl Into<Integer>, buffer: &mut [T])
+where
+    T: rug::integer::UnsignedPrimitive,
+{
+    let integer = integer.into();
+    let slice_start = buffer
+        .len()
+        .saturating_sub(integer.significant_digits::<T>());
+
+    integer.write_digits(&mut buffer[slice_start..], Order::Msf);
+}
+
+fn get_digits_from_integer<I, T>(integer: I, array_width: usize, zero: T) -> Vec<T>
+where
+    T: rug::integer::UnsignedPrimitive + Copy,
+    I: Into<Integer>,
+{
+    let mut buffer = vec![zero; array_width];
+
+    get_digits_from_integer_buf(integer, &mut buffer);
+
+    buffer
+}
+
 /// Solves a challenge.
 ///
 /// This function is meant to be slow and CPU-intensive. Do not run it on the UI thread.
@@ -88,8 +139,11 @@ pub fn solve(challenge: &Challenge) -> Solution {
         y = y.pow_mod(&Integer::from(2), &n).unwrap();
     }
 
-    let mut bytes: Vec<u8> = x.to_digits(Order::Msf);
-    bytes.append(&mut y.to_digits(Order::Msf));
+    let mut bytes: Vec<u8> = b"duckity".to_vec();
+    bytes.append(&mut get_digits_from_integer(n.clone(), 128, 0));
+    bytes.append(&mut get_digits_from_integer(x.clone(), 128, 0));
+    bytes.append(&mut get_digits_from_integer(challenge.t, 128, 0));
+    bytes.append(&mut get_digits_from_integer(y.clone(), 128, 0));
 
     let z = Sha256::digest(bytes);
     let z_int = Integer::from_digits(&z, Order::Msf);
@@ -112,8 +166,8 @@ pub fn solve(challenge: &Challenge) -> Solution {
     }
 
     Solution {
-        y: y.to_digits(Order::Msf),
-        pi: pi.to_digits(Order::Msf),
+        y: get_digits_from_integer(y, 128, 0),
+        pi: get_digits_from_integer(pi, 128, 0),
     }
 }
 

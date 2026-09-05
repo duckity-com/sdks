@@ -1,3 +1,5 @@
+const RSA_MODULUS_SIZE = 512;
+
 interface ChallengeMeta {
   // The challenge's ID.
   challenge_id: string;
@@ -8,9 +10,9 @@ interface ChallengeMeta {
   // The ID of the protection profile this challenge was issued for.
   protection_profile_id: string;
   // The digits of the N Wesolowski VDF parameter, most significant digit first.
-  n: Array<number>;
+  n: number[];
   // The digits of the X Wesolowski VDF parameter, most significant digit first.
-  x: Array<number>;
+  x: number[];
   // The T Wesolowski VDF parameter.
   t: number;
 }
@@ -64,7 +66,7 @@ function getBigintWidth(number: bigint, alignment?: number): number {
     bitWidth = number.toString(2).length;
   }
 
-  let byteWidth = Math.ceil((bitWidth + 7) / 8);
+  let byteWidth = Math.floor((bitWidth + 7) / 8);
 
   if (alignment !== undefined) {
     byteWidth = Math.ceil(byteWidth / alignment) * alignment;
@@ -73,33 +75,41 @@ function getBigintWidth(number: bigint, alignment?: number): number {
   return byteWidth;
 }
 
+/**
+ * Returns a digit array from a big integer.
+ *
+ * @param number The number to get the digits from.
+ * @param width The byte width of the result. If undefined, this will be the minimum width required
+ * to represent the full number.
+ * @param digitBits The amount of bits per digit.
+ * @returns The digits, MSBF.
+ */
 function getDigitsFromBigint(
   number: bigint,
   width?: number,
   digitBits?: bigint,
 ): number[] {
-  let bytes: number[] = new Array(width).fill(0);
-
   if (digitBits === undefined) {
     digitBits = 32n;
   }
 
   if (width === undefined) {
-    width = parseInt(
-      (BigInt(number.toString(2).length) / digitBits).toString(),
-    );
+    width = getBigintWidth(number, 1);
   }
+
+  let digits = width / Number(digitBits / 8n);
+  let bytes: number[] = new Array(digits).fill(0);
 
   let mask = 0n;
-  for (let i = digitBits - 1n; i > 0; i--) {
+  for (let i = digitBits; i > 0; i--) {
     mask <<= 1n;
-    mask &= 1n;
+    mask |= 1n;
   }
 
-  for (let i = width - 1; i > 0; i--) {
-    let byte = parseInt((number & mask).toString());
-    number = number >> digitBits;
+  for (let i = digits - 1; i >= 0; i--) {
+    let byte = Number(number & mask);
     bytes[i] = byte;
+    number = number >> digitBits;
   }
 
   return bytes;
@@ -153,24 +163,24 @@ function isPrime(number: bigint, tests: number): boolean {
 }
 
 function isPrimeForBase(number: bigint, base: bigint): boolean {
-  let number_minus_one = number - 1n;
+  let numberMinusOne = number - 1n;
 
-  let odd = number_minus_one;
-  let base_times = 0;
+  let odd = numberMinusOne;
+  let baseTimes = 0;
 
   while (odd % 2n == 0n) {
     odd /= 2n;
-    base_times += 1;
+    baseTimes += 1;
   }
 
-  let odd_power = modPow(base, odd, number);
+  let oddPower = modPow(base, odd, number);
 
-  for (let i = 0n; i < base_times; i++) {
-    if (odd_power == 1n || odd_power == number_minus_one) {
+  for (let i = 0n; i < baseTimes; i++) {
+    if (oddPower == 1n || oddPower == numberMinusOne) {
       return true;
     }
 
-    odd_power = modPow(odd_power, 2n, number);
+    oddPower = modPow(oddPower, 2n, number);
   }
 
   return false;
@@ -186,9 +196,15 @@ function getNextPrime(number: bigint): bigint {
   }
 }
 
+/**
+ * Extracts the challenge's data from the string.
+ * 
+ * @param challenge The raw challenge string.
+ * @returns The decoded challenge metadata.
+ */
 export function decode(challenge: string): Challenge {
-  // Counts all dots in the challenge string
-  if ((challenge.match(/\./g) || []).length != 1) {
+  // Counts all dots in the challenge string.
+  if (![1, 2].includes((challenge.match(/\./g) || []).length)) {
     throw Error(
       "The challenge string contained too many or not enough sections.",
     );
@@ -222,38 +238,41 @@ export function decode(challenge: string): Challenge {
  */
 export async function solve(challenge: Challenge): Promise<Solution> {
   let y = challenge.x;
-
   for (let i = 0; i < challenge.t; i++) {
-    y = y ** BigInt(2) % BigInt(challenge.t);
+    y = modPow(y, 2n, challenge.n);
   }
 
-  // Align to 4 bytes since each digit is a u32.
-  let width = getBigintWidth(y, 4);
-
-  let xBytes = getDigitsFromBigint(challenge.x, width, 8n);
-  let yBytes = getDigitsFromBigint(y, width, 8n);
-
   let bytes = Array.from(new TextEncoder().encode("duckity"));
-  bytes.concat(...xBytes);
-  bytes.concat(...yBytes);
+  bytes = bytes.concat(
+    ...getDigitsFromBigint(challenge.n, RSA_MODULUS_SIZE, 8n),
+  );
+  bytes = bytes.concat(
+    ...getDigitsFromBigint(challenge.x, RSA_MODULUS_SIZE, 8n),
+  );
+  bytes = bytes.concat(
+    ...getDigitsFromBigint(BigInt(challenge.t), RSA_MODULUS_SIZE, 8n),
+  );
+  bytes = bytes.concat(...getDigitsFromBigint(y, RSA_MODULUS_SIZE, 8n));
   let hash = await crypto.subtle.digest("SHA-256", new Uint8Array(bytes));
   let hashBytes = Array.from(new Uint8Array(hash));
 
   let z = getBigintFromDigits(hashBytes, 8n);
   let l = getNextPrime(z);
 
+  // We need 2^T = Q * L + R but 2^T is too big to calculate. Since 2^T is 2 << T in binary, we can
+  // calculate PI on the go by keeping that in mind without actually storing the whole number in
+  // memory.
+  let r = 1n;
   let pi = 1n;
-  let acc = challenge.x;
-  let exp_mod_l = 1n;
 
-  for (let i = 0; i < challenge.t; i++) {
-    let doubled = exp_mod_l * 2n;
+  for (let i = 0n; i < challenge.t; i++) {
+    r = r * 2n;
 
-    if (doubled >= l) {
-      pi = (pi * acc) % challenge.n;
-      exp_mod_l = doubled - l;
+    if (r >= l) {
+      r = r - l;
+      pi = (pi * pi * challenge.x) % challenge.n;
     } else {
-      exp_mod_l = doubled;
+      pi = (pi * pi) % challenge.n;
     }
   }
 
@@ -265,12 +284,15 @@ export async function solve(challenge: Challenge): Promise<Solution> {
 
 export function encode(original: string, solution: Solution): string {
   let solutionMeta: SolutionMeta = {
-    y: getDigitsFromBigint(solution.y, undefined, 32n),
-    pi: getDigitsFromBigint(solution.pi, undefined, 32n),
+    y: getDigitsFromBigint(solution.y, 512, 32n),
+    pi: getDigitsFromBigint(solution.pi, 512, 32n),
   };
 
   let solutionMetaJson = JSON.stringify(solutionMeta);
-  let solutionMetaBase64 = btoa(solutionMetaJson);
+  let solutionMetaBase64 = btoa(solutionMetaJson)
+    .replaceAll("=", "")
+    .replaceAll("+", "-")
+    .replaceAll("/", "_");
 
   return `${original}.${solutionMetaBase64}`;
 }

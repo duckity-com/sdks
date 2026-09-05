@@ -1,0 +1,13 @@
+{
+    "name": "duckity",
+    "version": "1.0.0",
+    "workspaces": [
+        "duckity_js",
+        "duckity_react",
+        "duckity_react/example"
+    ],
+    "devDependencies": {
+        "@duckity/js": "workspace:duckity_js",
+        "@duckity/react": "workspace:duckity_react"
+    }
+}

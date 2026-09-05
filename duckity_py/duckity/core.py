@@ -1,10 +1,6 @@
-import math
-
 import json
 
 import base64
-
-import struct
 
 import hashlib
 
@@ -41,6 +37,47 @@ class Solution:
     pi: gmpy2.mpz
 
 
+def get_mpz_from_digits(digits: list[int], digit_byte_width: int) -> gmpy2.mpz:
+    """Converts a list of MSF digits to a `gmpy2.mpz`.
+
+    Arguments:
+        digits (list[int]): The unsigned 32-bit digits.
+        digit_byte_width (int): The amount of bytes each digit carries.
+
+    Returns:
+        gmpy2.mpz: The resulting GMP number.
+    """
+
+    return gmpy2.mpz.from_bytes(b"".join(i.to_bytes(digit_byte_width) for i in digits))
+
+
+def get_digits_from_mpz(number: gmpy2.mpz | int, array_width: int, digit_byte_width: int) -> list[int]:
+    """Converts a MPZ integer to its MSF digits.
+
+    Arguments:
+        number (gmpy2.mpz | int): The number to convert to digits.
+        array_width (int): The amount of digits to return, padded with 0s.
+        digit_byte_width (int): The amount of bytes each digit will carry.
+
+    Returns:
+        list[int]: The digits.
+    """
+
+    digits = [0] * array_width
+
+    mask = 0
+    for i in range(digit_byte_width):
+        mask <<= 8
+        mask |= 0b1111_1111
+
+    for i in range(array_width):
+        digit = number & mask
+        digits[array_width - 1 - i] = int(digit)
+        number >>= digit_byte_width * 8
+
+    return digits
+
+
 def decode(challenge: str) -> Challenge:
     parts = challenge.split(".")
 
@@ -50,7 +87,7 @@ def decode(challenge: str) -> Challenge:
 
     challenge_part = parts[0]
 
-    # Readd padding
+    # Re-add padding
     data = base64.urlsafe_b64decode(challenge_part + "=" * (-len(challenge_part) % 4))
     data = json.loads(data)
 
@@ -78,12 +115,12 @@ def solve(challenge: Challenge) -> Solution:
     for _ in range(challenge.t):
         y = (y**2) % challenge.n
 
-    width = (challenge.n.bit_length() + 7) // 8
-
     hash = hashlib.sha256()
     hash.update(b"duckity")
-    hash.update(challenge.x.to_bytes(width, "big"))
-    hash.update(y.to_bytes(width, "big"))
+    hash.update(get_digits_from_mpz(challenge.n, 512, 1))
+    hash.update(get_digits_from_mpz(challenge.x, 512, 1))
+    hash.update(get_digits_from_mpz(challenge.t, 512, 1))
+    hash.update(get_digits_from_mpz(y, 512, 1))
     hash = hash.digest()
 
     l = gmpy2.mpz.from_bytes(hash, "big")
@@ -107,42 +144,9 @@ def solve(challenge: Challenge) -> Solution:
     return Solution(y=y, pi=pi)
 
 
-def verify(challenge: Challenge, solution: Solution) -> bool:
-    n = challenge.n
-    x = challenge.x
-    t = challenge.t
-    y = solution.y
-    pi = solution.pi
-
-    # y must be in the RSA group/range
-    if not (0 <= x < n and 0 <= y < n and 0 <= pi < n):
-        return False
-
-    width = _aligned_bytes(n, 4)
-
-    h = hashlib.sha256()
-    h.update(b"duckity")
-    h.update(x.to_bytes(width, "big"))
-    h.update(y.to_bytes(width, "big"))
-
-    l = gmpy2.mpz.from_bytes(h.digest(), "big")
-    l = gmpy2.next_prime(l)
-
-    r = gmpy2.powmod(2, t, l)
-
-    return y == gmpy2.powmod(pi, l, n) * gmpy2.powmod(x, r, n) % n
-
-
-def _aligned_bytes(value: int, alignment: int) -> bytes:
-    return math.ceil((value.bit_length() + 7) // 8 / alignment) * alignment
-
-
 def encode(original: str, solution: Solution) -> str:
-    y_bytes = solution.y.to_bytes(_aligned_bytes(solution.y, 4))
-    pi_bytes = solution.pi.to_bytes(_aligned_bytes(solution.pi, 4))
-
-    y_digits: list[int] = list(struct.unpack(f">{math.ceil(len(y_bytes) / 4)}I", y_bytes))
-    pi_digits: list[int] = list(struct.unpack(f">{math.ceil(len(pi_bytes) / 4)}I", pi_bytes))
+    y_digits = get_digits_from_mpz(solution.y, 512, 4)
+    pi_digits = get_digits_from_mpz(solution.pi, 512, 4)
 
     solution = {"y": y_digits, "pi": pi_digits}
     solution = json.dumps(solution)

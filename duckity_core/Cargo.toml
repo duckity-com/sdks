@@ -2,7 +2,6 @@
 name = "duckity-core"
 version = "0.1.0"
 edition = "2024"
-authors = ["Nyeki <me@nyeki.dev>"]
 readme = "README.md"
 license = "MIT"
 description = "Core utilities for native Duckity SDKs."

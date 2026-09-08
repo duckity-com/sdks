@@ -10,7 +10,7 @@ rustdoc-args = ["--html-in-header", "static/header.html"]
 crate-type = ["cdylib", "staticlib"]
 
 [dependencies]
-duckity = { version = "0.1.0", path = "../duckity_rs" }
+duckity = { path = "../duckity_rs" }
 
 [build-dependencies]
 cbindgen = "0.29.2"

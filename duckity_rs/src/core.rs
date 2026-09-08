@@ -35,9 +35,9 @@ pub struct Challenge {
 
 impl Challenge {
     /// Returns the challenge's hardness.
-    /// 
+    ///
     /// This is a reader for `Challenge::t`.
-    /// 
+    ///
     /// Returns:
     /// [`u32`] - The challenge's hardness.
     pub fn hardness(&self) -> u32 {
@@ -140,34 +140,32 @@ pub fn solve(challenge: &Challenge) -> Solution {
     }
 
     let mut bytes: Vec<u8> = b"duckity".to_vec();
-    bytes.append(&mut get_digits_from_integer(n.clone(), 128, 0));
-    bytes.append(&mut get_digits_from_integer(x.clone(), 128, 0));
-    bytes.append(&mut get_digits_from_integer(challenge.t, 128, 0));
-    bytes.append(&mut get_digits_from_integer(y.clone(), 128, 0));
+    bytes.append(&mut get_digits_from_integer(n.clone(), 512, 0));
+    bytes.append(&mut get_digits_from_integer(x.clone(), 512, 0));
+    bytes.append(&mut get_digits_from_integer(challenge.t, 512, 0));
+    bytes.append(&mut get_digits_from_integer(y.clone(), 512, 0));
 
     let z = Sha256::digest(bytes);
     let z_int = Integer::from_digits(&z, Order::Msf);
     let l = z_int.next_prime();
 
-    let mut pi = Integer::from(1);
-    let mut acc = x.clone();
-    let mut exp_mod_l = Integer::from(1);
+    let mut r = Integer::from(1);
+    let mut s = Integer::from(1);
 
     for _ in 0..challenge.t {
-        let doubled = (&exp_mod_l * 2u32).complete();
-        if doubled >= l {
-            pi = (&pi * &acc).complete() % &n;
-            exp_mod_l = (&doubled - &l).complete();
-        } else {
-            exp_mod_l = doubled;
-        }
+        r *= 2;
 
-        acc = acc.pow_mod(&Integer::from(2), &n).unwrap();
+        if r >= l {
+            r -= &l;
+            s = ((&s * &s).complete() * &x) % &n;
+        } else {
+            s = (&s * &s).complete() % &n;
+        }
     }
 
     Solution {
         y: get_digits_from_integer(y, 128, 0),
-        pi: get_digits_from_integer(pi, 128, 0),
+        pi: get_digits_from_integer(s, 128, 0),
     }
 }
 

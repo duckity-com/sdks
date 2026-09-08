@@ -64,8 +64,8 @@ async fn main() -> anyhow::Result<()> {
         anyhow::Ok(encoded)
     })
     .await
-    .context("Could not solve the fetched challenge from the duclling API.")?
-    .context("Could not solve the fetched challenge from the duclling API.")?;
+    .context("Could not solve the fetched challenge from the duckling API.")?
+    .context("Could not encode the fetched challenge from the duckling API.")?;
 
     let solution_elapsed = solution_start.elapsed();
 
@@ -77,6 +77,7 @@ async fn main() -> anyhow::Result<()> {
         &args.application_secret,
         &args.protection_profile_id,
     )
+    .base_url("https://quack.duckity.dev/v1")
     .await
     .context("Could not validate challenge solution.")?;
 

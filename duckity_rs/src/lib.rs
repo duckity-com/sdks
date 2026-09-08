@@ -1,5 +1,8 @@
 //! A pure-Rust Duckity API client.
 //!
+//! For a more detailed documentation, check out
+//! [Duckity Docs on the Rust SDK](https://duckity.com/docs/sdks/rust).
+//!
 //! # Installation
 //!
 //! To add the package to your project, install it with cargo:
@@ -13,30 +16,11 @@
 //! First of all, you need a Duckity application. Head over to the
 //! [Duckity dashboard](https://app.duckity.com) to create one if you don't have created it yet.
 //!
-//! To get a challenge, use [`duckity::get`](get).
+//! To solve a challenge, use [`duckity::solve`](solve).
 //!
 //! ```
-//! let challenge = duckity::get(application_id, protection_profile_id).await?;
+//! let solution = duckity::solve(application_id, protection_profile_id).await?;
 //! ```
-//!
-//! If you self-host your duckling, use [`duckity::get().base_url()`](ChallengeGetter::base_url) to
-//! point the client to your duckling like follows:
-//!
-//! ```
-//! let challenge = duckity::get(application_id, protection_profile_id)
-//!     .base_url("https://quack.example.com/v1")
-//!     .await?;
-//! ```
-//!
-//! Once you have a challenge string, solve it with [`duckity::solve`](solve).
-//!
-//! ```
-//! let solution = duckity::solve(challenge)?;
-//! ```
-//!
-//! Note that solving a challenge is CPU-intensive. Use a separate thread if you do not want to
-//! freeze your application's execution. Do not run directly in async contexts either, check your
-//! runtime's documentation on how to run blocking code.
 //!
 //! # Compiling
 //!
@@ -47,7 +31,7 @@
 //! # Contributing
 //!
 //! Contributions of any kind are welcome! Suggestions, issues, PRs, and everything else goes into
-//! our [SDKs repository in GitHub](https://github.com/duckity-dev/sdks).
+//! our [SDKs repository in GitHub](https://github.com/duckity-com/sdks).
 
 #![cfg_attr(not(feature = "std"), no_std)]
 

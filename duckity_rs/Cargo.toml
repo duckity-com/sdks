@@ -1,7 +1,9 @@
 [package]
 name = "duckity"
+description = "Rust client and server SDK for Duckity."
 version = "1.1.0"
 edition = "2024"
+homepage = "https://duckity.com/"
 documentation = "https://duckity.com/docs/sdks/rust"
 license = "MIT"
 

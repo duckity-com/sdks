@@ -1,9 +1,13 @@
 {
   "name": "@duckity/js",
   "type": "module",
-  "version": "0.2.1",
+  "version": "1.0.0",
   "module": "src/index.ts",
   "types": "dist/index.d.ts",
+  "homepage": "https://duckity.com/docs/sdks/javascript",
+  "repository": {
+    "url": "https://github.com/duckity-com/sdks"
+  },
   "collaborators": [
     "Rafael Bradley <rafabradleyrb@gmail.com>"
   ],

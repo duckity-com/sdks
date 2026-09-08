@@ -63,7 +63,7 @@ export function get<T>(url: string, options?: RequestInit): Promise<T> {
  */
 export function post<T>(
   url: string,
-  options?: Omit<RequestInit, "body" | "method"> & { body: any },
+  options?: Omit<RequestInit, "body" | "method"> & { body?: any },
 ): Promise<T> {
   return request(url, {
     method: "POST",

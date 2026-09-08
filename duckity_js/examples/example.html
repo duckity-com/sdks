@@ -50,11 +50,11 @@
     <script type="module">
       import * as duckity from "../dist/index.js";
 
-      const PROTECTION_PROFILE_ID = "idp-r4-dpQmaQYq1s4uAW";
+      const PROTECTION_PROFILE_ID = "nIjTGgQ-bCNPn-m153dMl";
 
       console.log("Starting solution...")
       console.time("solution")
-      let solution = await duckity.solve(PROTECTION_PROFILE_ID, { api: "http://localhost:3210/v1" });
+      let solution = await duckity.solve(PROTECTION_PROFILE_ID);
       console.timeEnd("solution")
       console.log("Solution", solution)
 

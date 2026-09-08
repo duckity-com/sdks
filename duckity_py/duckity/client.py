@@ -12,6 +12,8 @@ _executor = ProcessPoolExecutor()
 
 
 class Client:
+    """A client for Duckity's Duckling API."""
+
     _base_url = "https://api.duckity.com/d1"
 
     def __init__(self, base_url: str = None):
@@ -35,7 +37,8 @@ class Client:
         response.raise_for_status()
 
         data = response.json()
-        challenge = core.decode(data["challenge"])
+        original = data["challenge"]
+        challenge = core.decode(original)
 
         loop = asyncio.get_running_loop()
         solution = await loop.run_in_executor(
@@ -44,7 +47,7 @@ class Client:
             challenge,
         )
 
-        return core.encode(challenge, solution)
+        return core.encode(original, solution)
 
     async def validate(
         self, solution: str, ip: str, application_secret: str, protection_profile_id: str

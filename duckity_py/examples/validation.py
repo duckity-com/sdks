@@ -9,8 +9,8 @@ import duckity.core
 #
 # Paste your own protection profile ID and application secret to validate using your own protection
 # profile.
-PROTECTION_PROFILE_ID = "idp-r4-dpQmaQYq1s4uAW"
-APPLICATION_SECRET = "ifTQXNY4QApnnadnZazAqv4hj5rCbMW7lLN3OL1WyXD"
+PROTECTION_PROFILE_ID = "nIjTGgQ-bCNPn-m153dMl"
+APPLICATION_SECRET = "9L3QMV-iDrUhwNR2VAYDRGxeJLIupa-iKD5mUTsb9x9"
 
 
 async def main():
@@ -28,9 +28,8 @@ async def main():
 
     print("Validating solution...")
 
-    # In async code with actual concurrency, unlike this example, move this call to a thread.
     is_valid = await client.validate(
-        PROTECTION_PROFILE_ID, APPLICATION_SECRET, solution, challenge.ip
+        solution, challenge.ip, APPLICATION_SECRET, PROTECTION_PROFILE_ID
     )
 
     print(f"Challenge validated! Is valid? {is_valid}")

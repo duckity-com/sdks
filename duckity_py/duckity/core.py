@@ -1,3 +1,5 @@
+import io
+
 import json
 
 import base64
@@ -117,29 +119,26 @@ def solve(challenge: Challenge) -> Solution:
 
     hash = hashlib.sha256()
     hash.update(b"duckity")
-    hash.update(get_digits_from_mpz(challenge.n, 512, 1))
-    hash.update(get_digits_from_mpz(challenge.x, 512, 1))
-    hash.update(get_digits_from_mpz(challenge.t, 512, 1))
-    hash.update(get_digits_from_mpz(y, 512, 1))
+    hash.update(bytes(get_digits_from_mpz(challenge.n, 512, 1)))
+    hash.update(bytes(get_digits_from_mpz(challenge.x, 512, 1)))
+    hash.update(bytes(get_digits_from_mpz(challenge.t, 512, 1)))
+    hash.update(bytes(get_digits_from_mpz(y, 512, 1)))
     hash = hash.digest()
 
     l = gmpy2.mpz.from_bytes(hash, "big")
     l = gmpy2.next_prime(l)
 
+    r = gmpy2.mpz(1)
     pi = gmpy2.mpz(1)
-    acc = challenge.x
-    exp_mod_l = gmpy2.mpz(1)
 
     for _ in range(challenge.t):
-        doubled = exp_mod_l * 2
+        r *= 2
 
-        if doubled >= l:
-            pi = (pi * acc) % challenge.n
-            exp_mod_l = doubled - l
+        if r >= l:
+            r -= l
+            pi = (pi * pi * challenge.x) % challenge.n
         else:
-            exp_mod_l = doubled
-
-        acc = (acc**2) % challenge.n
+            pi = (pi * pi) % challenge.n
 
     return Solution(y=y, pi=pi)
 

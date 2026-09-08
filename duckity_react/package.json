@@ -1,6 +1,11 @@
 {
   "name": "@duckity/react",
-  "version": "0.3.2",
+  "version": "1.0.0",
+  "description": "A React SDK for Duckity.",
+  "homepage": "https://duckity.com/docs/sdks/react",
+  "repository": {
+    "url": "https://github.com/duckity-com/sdks"
+  },
   "type": "module",
   "files": [
     "src",

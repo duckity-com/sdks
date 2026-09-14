@@ -44,12 +44,7 @@ export async function solve(
   }
 
   let response: ChallengeResponse = await post(
-    `${options?.api || "https://api.duckity.com/d1"}/challenges/${protectionProfileId}/issue`,
-    {
-      headers: {
-        "x-duckity-csrf": "1",
-      }
-    }
+    `${options?.api || "https://api.duckity.com/d1"}/challenges/${protectionProfileId}/issue`
   );
 
   let solution = await getWorkerApi().solve(response.challenge);

@@ -119,7 +119,7 @@ impl ChallengeGetter {
             url
         };
 
-        let request = client.post(url).header("x-duckity-csrf", "1");
+        let request = client.post(url);
 
         let response = request.send().await?;
         let response: ChallengeResponse = response.json().await?;

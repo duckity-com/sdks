@@ -32,7 +32,6 @@ class Client:
 
         response = await _http.post(
             f"{self._base_url}/challenges/{protection_profile_id}/issue",
-            headers={"X-Duckity-CSRF": "1"},
         )
         response.raise_for_status()
 

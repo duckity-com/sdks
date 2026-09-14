@@ -1,6 +1,6 @@
 {
   "name": "@duckity/react",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A React SDK for Duckity.",
   "homepage": "https://duckity.com/docs/sdks/react",
   "repository": {
@@ -32,7 +32,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "@duckity/js": "^0.2.1",
+    "@duckity/js": "^1.0.1",
     "react": "^19.2.8",
     "swr": "^2.5.1"
   }

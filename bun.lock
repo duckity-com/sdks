@@ -11,7 +11,7 @@
     },
     "duckity_js": {
       "name": "@duckity/js",
-      "version": "0.2.1",
+      "version": "1.0.1",
       "dependencies": {
         "comlink": "^4.4.2",
       },
@@ -31,7 +31,7 @@
     },
     "duckity_react": {
       "name": "@duckity/react",
-      "version": "0.3.2",
+      "version": "1.0.0",
       "dependencies": {
         "@duckity/js": "^0.2.1",
         "react": "^19.2.8",

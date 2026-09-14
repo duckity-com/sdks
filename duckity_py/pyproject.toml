@@ -1,7 +1,7 @@
 [project]
-name = "duckity-py"
-version = "0.1.0"
-description = "Add your description here"
+name = "duckity"
+version = "1.0.1"
+description = "Duckity.com's official Python SDK."
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [

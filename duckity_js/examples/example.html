@@ -50,13 +50,13 @@
     <script type="module">
       import * as duckity from "../dist/index.js";
 
-      const PROTECTION_PROFILE_ID = "nIjTGgQ-bCNPn-m153dMl";
+      const POLICY_ID = "nIjTGgQ-bCNPn-m153dMl";
 
-      console.log("Starting solution...")
-      console.time("solution")
-      let solution = await duckity.solve(PROTECTION_PROFILE_ID);
-      console.timeEnd("solution")
-      console.log("Solution", solution)
+      console.log("Starting solution...");
+      console.time("solution");
+      let solution = await duckity.solve(POLICY_ID);
+      console.timeEnd("solution");
+      console.log("Solution", solution);
 
       const form = document.getElementById("form");
       const inputEmail = document.getElementById("input-email");

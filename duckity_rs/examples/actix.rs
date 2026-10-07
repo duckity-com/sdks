@@ -6,7 +6,7 @@ use serde::Deserialize;
 
 // In an actual application, make these two configurable. `clap` is a good tool for that.
 const APPLICATION_SECRET: &str = "<your-application-secret>";
-const PROTECTION_PROFILE_ID: &str = "<your-protection-profile-id>";
+const POLICY_ID: &str = "<your-policy-id>";
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -31,7 +31,7 @@ async fn protected(req: HttpRequest, payload: Json<ProtectedRequestPayload>) -> 
         payload.solution.clone(),
         addr.ip(),
         APPLICATION_SECRET,
-        PROTECTION_PROFILE_ID,
+        POLICY_ID,
     )
     .await
     .unwrap();

@@ -19,7 +19,7 @@
 //! To solve a challenge, use [`duckity::solve`](solve).
 //!
 //! ```
-//! let solution = duckity::solve(application_id, protection_profile_id).await?;
+//! let solution = duckity::solve(application_id, policy_id).await?;
 //! ```
 //!
 //! # Compiling
@@ -60,24 +60,24 @@ static HOSTED_BASE_URL: &str = "https://api.duckity.com/d1";
 /// For example:
 /// ```
 /// // Challenge from api.duckity.com.
-/// let solution = duckity::get(protection_profile_id).await?;
+/// let solution = duckity::get(policy_id).await?;
 ///
 /// // Challenge from a self-hosted duckling.
-/// let solution = duckity::get(protection_profile_id)
+/// let solution = duckity::get(policy_id)
 ///     .base_url("https://quack.example.com/v1")
 ///     .await?;
 /// ```
 ///
 /// Arguments:
-/// * `protection_profile_id` - The protection profile's ID.
+/// * `policy_id` - The policy's ID.
 ///
 /// Returns:
 /// [`ChallengeGetter`] - An awaitable builder to get a challenge.
 #[cfg(feature = "std")]
-pub fn solve(protection_profile_id: impl Into<String>) -> ChallengeGetter {
+pub fn solve(policy_id: impl Into<String>) -> ChallengeGetter {
     ChallengeGetter {
         base_url: HOSTED_BASE_URL.to_string(),
-        protection_profile_id: protection_profile_id.into(),
+        policy_id: policy_id.into(),
     }
 }
 
@@ -85,7 +85,7 @@ pub fn solve(protection_profile_id: impl Into<String>) -> ChallengeGetter {
 #[cfg(feature = "std")]
 pub struct ChallengeGetter {
     base_url: String,
-    protection_profile_id: String,
+    policy_id: String,
 }
 
 #[cfg(feature = "std")]
@@ -115,7 +115,7 @@ impl ChallengeGetter {
 
         let url = {
             let mut url = self.base_url;
-            url.push_str(&format!("/challenges/{}/issue", self.protection_profile_id));
+            url.push_str(&format!("/challenges/{}/issue", self.policy_id));
             url
         };
 
@@ -164,7 +164,7 @@ impl IntoFuture for ChallengeGetter {
 #[cfg(feature = "std")]
 /// Solution validation builder. Initialized via [`validate`]. Awaitable.
 pub struct SolutionValidator {
-    protection_profile_id: String,
+    policy_id: String,
     application_secret: String,
     ip: IpAddr,
     base_url: String,
@@ -198,10 +198,7 @@ impl SolutionValidator {
 
         let url = {
             let mut url = self.base_url;
-            url.push_str(&format!(
-                "/challenges/{}/validate",
-                self.protection_profile_id
-            ));
+            url.push_str(&format!("/challenges/{}/validate", self.policy_id));
             url
         };
 
@@ -236,16 +233,16 @@ impl IntoFuture for SolutionValidator {
 /// Arguments:
 /// * `solution` - The solution token to validate.
 /// * `ip` - The IP of the client that submitted the solution.
-/// * `application_secret` - The secret of the protection profile's application.
-/// * `protection_profile_id` - The ID of the protection profile this challenge was submitted for.
+/// * `application_secret` - The secret of the policy's application.
+/// * `policy_id` - The ID of the policy this challenge was submitted for.
 pub fn validate(
     solution: impl Into<String>,
     ip: impl Into<IpAddr>,
     application_secret: impl Into<String>,
-    protection_profile_id: impl Into<String>,
+    policy_id: impl Into<String>,
 ) -> SolutionValidator {
     SolutionValidator {
-        protection_profile_id: protection_profile_id.into(),
+        policy_id: policy_id.into(),
         application_secret: application_secret.into(),
         ip: ip.into(),
         base_url: HOSTED_BASE_URL.to_string(),

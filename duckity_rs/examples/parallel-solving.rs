@@ -1,6 +1,6 @@
 use std::io::{self, Write};
 
-const PROTECTION_PROFILE_ID: &str = "<your-own-protection-profile-id>";
+const POLICY_ID: &str = "<your-own-policy-id>";
 
 struct Credentials {
     email: String,
@@ -9,7 +9,7 @@ struct Credentials {
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    let solution_task = tokio::spawn(duckity::solve(PROTECTION_PROFILE_ID).into_future());
+    let solution_task = tokio::spawn(duckity::solve(POLICY_ID).into_future());
 
     let credentials = tokio::task::spawn_blocking(|| {
         let mut email = String::new();

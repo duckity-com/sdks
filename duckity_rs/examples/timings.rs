@@ -2,12 +2,12 @@ use anyhow::Context;
 use clap::Parser;
 use tokio::time::Instant;
 
-/// A simple example of using Duckity to get a challenge for a protection profile.
+/// A simple example of using Duckity to get a challenge for a policy.
 #[derive(clap::Parser)]
 struct Args {
-    /// Your protection profile's ID.
-    #[arg(env = "DUCKITY_PROTECTION_PROFILE_ID")]
-    protection_profile_id: String,
+    /// Your policy's ID.
+    #[arg(env = "DUCKITY_POLICY_ID")]
+    policy_id: String,
 
     #[arg(env = "DUCKITY_APPLICATION_SECRET")]
     application_secret: String,
@@ -43,7 +43,7 @@ async fn main() -> anyhow::Result<()> {
 
     let challenge_start = Instant::now();
 
-    let challenge = duckity::solve(&args.protection_profile_id)
+    let challenge = duckity::solve(&args.policy_id)
         .send()
         .await
         .context("Could not get the challenge from the duckling API.")?;
@@ -75,7 +75,7 @@ async fn main() -> anyhow::Result<()> {
         &solution,
         decoded_copy.ip,
         &args.application_secret,
-        &args.protection_profile_id,
+        &args.policy_id,
     )
     .base_url("https://quack.duckity.dev/v1")
     .await

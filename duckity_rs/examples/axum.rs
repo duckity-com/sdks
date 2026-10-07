@@ -9,7 +9,7 @@ use tokio::net::TcpListener;
 
 // In an actual application, make these two configurable. `clap` is a good tool for that.
 const APPLICATION_SECRET: &str = "<your-application-secret>";
-const PROTECTION_PROFILE_ID: &str = "<your-protection-profile-id>";
+const POLICY_ID: &str = "<your-policy-id>";
 
 #[tokio::main]
 async fn main() {
@@ -34,14 +34,9 @@ async fn handler(
     ConnectInfo(addr): ConnectInfo<SocketAddr>,
     Json(payload): Json<ProtectedRequestPayload>,
 ) -> impl IntoResponse {
-    let is_valid = duckity::validate(
-        payload.solution,
-        addr.ip(),
-        APPLICATION_SECRET,
-        PROTECTION_PROFILE_ID,
-    )
-    .await
-    .unwrap();
+    let is_valid = duckity::validate(payload.solution, addr.ip(), APPLICATION_SECRET, POLICY_ID)
+        .await
+        .unwrap();
 
     if is_valid {
         (StatusCode::OK, Json("This is protected!"))

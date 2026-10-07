@@ -71,25 +71,25 @@ interface Waiter {
 }
 
 /**
- * Hook to handle fetching and solving a challenge for a given application and protection profile.
+ * Hook to handle fetching and solving a challenge for a given application and policy.
  *
  * This hook starts solving a challenge on initiation, and will get a new one on every call to
  * `refresh()`. Use `wait()` to wait until a solution is ready.
  *
- * @param protectionProfileId The ID of the protection profile to use to get a challenge.
+ * @param policyId The ID of the policy to use to get a challenge.
  * @param options Additional configuration parameters, like the API's base URL.
  * @returns An object containing the the current status, solution, and functions to wait for a
  * solution and to refresh the challenge.
  */
 export function useChallenge(
-  protectionProfileId: string,
+  policyId: string,
   options?: duckity.GetDuckityChallengeOptions,
 ) {
   const waiters = useRef<Waiter[]>([]);
 
   const { data, error, mutate, isLoading, isValidating } = useSWR<string>(
-    `duckity:${protectionProfileId}`,
-    () => duckity.solve(protectionProfileId, options),
+    `duckity:${policyId}`,
+    () => duckity.solve(policyId, options),
   );
 
   let status: UseChallengeStatus = "solving";

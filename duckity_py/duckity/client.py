@@ -20,18 +20,18 @@ class Client:
         if base_url is not None:
             self._base_url = base_url
 
-    async def solve(self, protection_profile_id: str) -> str:
+    async def solve(self, policy_id: str) -> str:
         """Gets a new challenge from the API and solves it.
 
         Args:
-            protection_profile_id (str): The ID of the protection profile to get the challenge for.
+            policy_id (str): The ID of the policy to get the challenge for.
 
         Returns:
             str: The solution token.
         """
 
         response = await _http.post(
-            f"{self._base_url}/challenges/{protection_profile_id}/issue",
+            f"{self._base_url}/challenges/{policy_id}/issue",
         )
         response.raise_for_status()
 
@@ -49,7 +49,7 @@ class Client:
         return core.encode(original, solution)
 
     async def validate(
-        self, solution: str, ip: str, application_secret: str, protection_profile_id: str
+        self, solution: str, ip: str, application_secret: str, policy_id: str
     ) -> bool:
         """Validates a solution token.
 
@@ -57,14 +57,14 @@ class Client:
             solution (str): The encoded solution token.
             ip (str): The IP of the client that submitted the solution.
             application_secret (str): The application's secret.
-            protection_profile_id (str): The protection profile ID for which this token was issued.
+            policy_id (str): The policy ID for which this token was issued.
 
         Returns:
             bool: Whether the solution is valid.
         """
 
         response = await _http.post(
-            f"{self._base_url}/challenges/{protection_profile_id}/validate",
+            f"{self._base_url}/challenges/{policy_id}/validate",
             json={"solution": solution, "ip": ip},
             headers={"Authorization": f"Bearer {application_secret}"},
         )

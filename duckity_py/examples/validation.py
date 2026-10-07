@@ -7,9 +7,8 @@ import duckity.core
 # In a real world scenario the secret is not available to the client, validation is done
 # server-side.
 #
-# Paste your own protection profile ID and application secret to validate using your own protection
-# profile.
-PROTECTION_PROFILE_ID = "nIjTGgQ-bCNPn-m153dMl"
+# Paste your own policy ID and application secret to validate using your own policy.
+POLICY_ID = "nIjTGgQ-bCNPn-m153dMl"
 APPLICATION_SECRET = "9L3QMV-iDrUhwNR2VAYDRGxeJLIupa-iKD5mUTsb9x9"
 
 
@@ -28,9 +27,7 @@ async def main():
 
     print("Validating solution...")
 
-    is_valid = await client.validate(
-        solution, challenge.ip, APPLICATION_SECRET, PROTECTION_PROFILE_ID
-    )
+    is_valid = await client.validate(solution, challenge.ip, APPLICATION_SECRET, POLICY_ID)
 
     print(f"Challenge validated! Is valid? {is_valid}")
 

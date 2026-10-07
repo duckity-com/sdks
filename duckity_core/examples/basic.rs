@@ -5,12 +5,12 @@ use clap::Parser;
 use serde::{Deserialize, Serialize};
 use tokio::time::Instant;
 
-/// A simple example of using Duckity to get a challenge for a protection profile.
+/// A simple example of using Duckity to get a challenge for a policy.
 #[derive(clap::Parser)]
 struct Args {
-    /// Your protection profile's ID.
-    #[arg(env = "DUCKITY_PROTECTION_PROFILE_ID")]
-    protection_profile_id: String,
+    /// Your policy's ID.
+    #[arg(env = "DUCKITY_POLICY_ID")]
+    policy_id: String,
 }
 
 #[derive(Serialize)]
@@ -57,7 +57,7 @@ async fn main() -> anyhow::Result<()> {
 
     let url = format!(
         "https://quack.duckity.com/v1/challenges/{}/issue",
-        args.protection_profile_id
+        args.policy_id
     );
     let request = client.post(url).json(&ChallengeRequest {
         keys: HashMap::new(),

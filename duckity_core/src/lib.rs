@@ -20,7 +20,7 @@
 //! like follows:
 //!
 //! ```http
-//! GET /d1/challenges/{protection_profile_id}/issue HTTP/1.1
+//! GET /d1/challenges/{policy_id}/issue HTTP/1.1
 //! Host: api.duckity.com
 //! ```
 //!

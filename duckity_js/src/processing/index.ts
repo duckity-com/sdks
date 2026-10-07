@@ -7,8 +7,8 @@ interface ChallengeMeta {
   ip: string;
   // The unix timestamp, in milliseconds, in which the challenge was issued.
   timestamp: number;
-  // The ID of the protection profile this challenge was issued for.
-  protection_profile_id: string;
+  // The ID of the policy this challenge was issued for.
+  policy_id: string;
   // The digits of the N Wesolowski VDF parameter, most significant digit first.
   n: number[];
   // The digits of the X Wesolowski VDF parameter, most significant digit first.
@@ -198,7 +198,7 @@ function getNextPrime(number: bigint): bigint {
 
 /**
  * Extracts the challenge's data from the string.
- * 
+ *
  * @param challenge The raw challenge string.
  * @returns The decoded challenge metadata.
  */

@@ -1,17 +1,21 @@
 [project]
 name = "duckity"
-version = "1.0.1"
+version = "1.0.3"
 description = "Duckity.com's official Python SDK."
 readme = "README.md"
 requires-python = ">=3.13"
+license = "MIT"
+urls.homepage = "https://duckity.com/"
+urls.documentation = "https://duckity.com/docs/sdks/python"
+urls.repository = "https://github.com/duckity-com/sdks"
 dependencies = [
-    "gmpy2>=2.3.1",
-    "httpx>=0.28.1",
+  "gmpy2>=2.3.1",
+  "httpx>=0.28.1",
 ]
 
 [dependency-groups]
 dev = [
-    "gmpy2-stubs>=2.2.1.5",
+  "gmpy2-stubs>=2.2.1.5",
 ]
 
 [tool.ruff]

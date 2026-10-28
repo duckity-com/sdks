@@ -1,10 +1,21 @@
 {
   "name": "@duckity/react",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A React SDK for Duckity.",
   "homepage": "https://duckity.com/docs/sdks/react",
+  "license": "MIT",
+  "keywords": [
+    "captcha",
+    "bot",
+    "protection",
+    "duckity",
+    "proof-of-work"
+  ],
   "repository": {
     "url": "https://github.com/duckity-com/sdks"
+  },
+  "bugs": {
+    "url": "https://github.com/duckity-com/sdks/issues"
   },
   "type": "module",
   "files": [
